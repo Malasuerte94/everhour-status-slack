@@ -2,8 +2,11 @@
 /**
  * Plugin Name: Everhour Status Slack
  * Description: Integrates Everhour with Slack to update statuses based on timer events.
- * Version: 1.0
+ * Version: 1.1
  * Author: Catalin Ion Ene
+ * Author URI: https://catalin-ene.ro
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  */
 
 // Exit if accessed directly.

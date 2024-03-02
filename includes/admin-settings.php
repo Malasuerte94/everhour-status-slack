@@ -3,7 +3,7 @@
 function register_everhour_slack_integration_admin_page(): void
 {
     add_menu_page(
-        'Everhour Slack Integration Settings',
+        'Everhour Slack Status - Integration Settings',
         'Everhour Slack',
         'manage_options',
         'everhour-slack-integration',

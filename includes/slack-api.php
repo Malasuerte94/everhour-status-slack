@@ -1,6 +1,7 @@
 <?php
 
-function update_slack_status($status_text) {
+function update_slack_status($status_text): void
+{
     $slack_api_key = get_option('slack_api_key', '');
 
     $api_url = 'https://slack.com/api/users.profile.set';
@@ -33,7 +34,8 @@ function update_slack_status($status_text) {
     }
 }
 
-function clear_slack_status() {
+function clear_slack_status(): void
+{
     $slack_api_key = get_option('slack_api_key', '');
 
     $api_url = 'https://slack.com/api/users.profile.set';
