@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Everhour Slack Integration
+ * Plugin Name: Everhour Status Slack
  * Description: Integrates Everhour with Slack to update statuses based on timer events.
  * Version: 1.0
- * Author: Your Name
+ * Author: Catalin Ion Ene
  */
 
 // Exit if accessed directly.
