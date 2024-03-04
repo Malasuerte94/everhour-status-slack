@@ -28,8 +28,6 @@ function pluginHtmlAdminPage(): void
     // Check for reset action and clear the everhour_webhook_id
     if (isset($_POST['action']) && $_POST['action'] == 'reset_webhook') {
         delete_option('everhour_webhook_id');
-        clearSlackStatus();
-        updateSlackStatus('IO-176:Frontend');
         echo '<div id="message" class="updated notice is-dismissible"><p>Everhour webhook ID reset successfully.</p></div>';
     }
 
