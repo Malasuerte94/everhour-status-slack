@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return void
+ */
 function register_everhour_slack_integration_admin_page(): void
 {
     add_menu_page(
@@ -7,16 +10,27 @@ function register_everhour_slack_integration_admin_page(): void
         'Everhour Slack',
         'manage_options',
         'everhour-slack-integration',
-        'everhour_slack_integration_admin_page_html',
+        'pluginHtmlAdminPage',
         'dashicons-admin-generic',
         20
     );
 }
 
-function everhour_slack_integration_admin_page_html(): void
+/**
+ * @return void
+ */
+function pluginHtmlAdminPage(): void
 {
     if (!current_user_can('manage_options')) {
         return;
+    }
+
+    // Check for reset action and clear the everhour_webhook_id
+    if (isset($_POST['action']) && $_POST['action'] == 'reset_webhook') {
+        delete_option('everhour_webhook_id');
+        clearSlackStatus();
+        updateSlackStatus('IO-176:Frontend');
+        echo '<div id="message" class="updated notice is-dismissible"><p>Everhour webhook ID reset successfully.</p></div>';
     }
 
     $everhour_webhook_id = get_option('everhour_webhook_id', '');
@@ -25,7 +39,7 @@ function everhour_slack_integration_admin_page_html(): void
         $everhour_api_key = get_option('everhour_api_key', '');
         $target_url = home_url('/wp-json/everhour-slack-integration/v1/webhook/'); // Ensure this is your correct endpoint
 
-        $response = create_everhour_webhook($everhour_api_key, $target_url);
+        $response = createEverhourWebhook($everhour_api_key, $target_url);
 
         if ($response['success']) {
             echo '<div id="message" class="updated notice is-dismissible"><p>Webhook generated successfully. ID: ' . esc_html($response['webhook_id']) . '</p></div>';
@@ -39,24 +53,6 @@ function everhour_slack_integration_admin_page_html(): void
         update_option('slack_api_key', sanitize_text_field($_POST['slack_api_key']));
         update_option('everhour_user_id', sanitize_text_field($_POST['everhour_user_id']));
         echo '<div id="setting-error-settings_updated" class="updated settings-error notice is-dismissible"><p><strong>Settings saved.</strong></p></div>';
-    }
-
-    $webhook_payload = get_option('everhour_webhook_payload', '');
-    if (!empty($webhook_payload)) {
-        echo '<h2>Last Webhook Payload</h2>';
-        echo '<pre>' . esc_html(print_r($webhook_payload, true)) . '</pre>';
-    }
-
-    $slack_clear_status = get_option('slack_stop_payload', '');
-    if (!empty($webhook_payload)) {
-        echo '<h2>Slack Clear Status</h2>';
-        echo '<pre>' . esc_html(print_r($slack_clear_status, true)) . '</pre>';
-    }
-
-    $slack_set_status = get_option('slack_set_payload', '');
-    if (!empty($webhook_payload)) {
-        echo '<h2>Slack Set Status</h2>';
-        echo '<pre>' . esc_html(print_r($slack_set_status, true)) . '</pre>';
     }
 
     // Get current settings
@@ -90,4 +86,31 @@ function everhour_slack_integration_admin_page_html(): void
     echo '<p class="submit"><button type="submit" class="button button-primary">Save and Generate Webhook</button></p>';
     echo '</form>';
     echo '</div>';
+
+    // Separate form for resetting the webhook ID
+    echo '<form method="POST">';
+    echo '<input type="hidden" name="action" value="reset_webhook">';
+    echo '<p class="submit"><button type="submit" class="button button-secondary">Reset Webhook ID</button></p>';
+    echo '</form>';
+    echo '</div>';
+
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'esi_logs';
+    $logs = $wpdb->get_results("SELECT * FROM $table_name ORDER BY timestamp DESC");
+
+    echo '<h2>LOGS</h2>';
+    echo '<table class="wp-list-table fixed widefat mine-table">';
+    echo '<thead><tr><th>ID</th><th>Action</th><th>Status</th><th>Value</th><th>Timestamp</th></tr></thead>';
+    echo '<tbody>';
+    if($logs) {
+        foreach ($logs as $log) {
+            $action = $log->action == 'CLEAR_STATUS' ? '🛑 STOP' : '<b>🟢 START</b>';
+            $status = $log->status == 'success' ? '➡️' : '⚠️';
+            $value = $log->value ?? '';
+            echo "<tr><td>{$log->id}</td><td>{$action}</td><td>{$status}</td><td>{$value}</td><td>{$log->timestamp}</td></tr>";
+        }
+    }
+    echo '</tbody></table>';
+
 }

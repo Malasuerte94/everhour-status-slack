@@ -1,9 +1,12 @@
 <?php
 
-function update_slack_status($status_text): void
+/**
+ * @param $status_text
+ * @return void
+ */
+function updateSlackStatus($status_text): void
 {
     $slack_api_key = get_option('slack_api_key', '');
-
     $api_url = 'https://slack.com/api/users.profile.set';
     $status_text_trimmed = mb_substr($status_text, 0, 99);
 
@@ -27,14 +30,17 @@ function update_slack_status($status_text): void
 
     if (is_wp_error($response)) {
         $error_message = $response->get_error_message();
-        update_option('slack_set_payload', ['SET ERROR', $error_message, 'Catalin']);
+        addLog('ADD_STATUS', 'error', $error_message);
     } else {
         $response_code = wp_remote_retrieve_response_code($response);
-        update_option('slack_set_payload', ['SET', $response_code]);
+        addLog('ADD_STATUS', 'success', ':male-technologist: : '.$status_text_trimmed);
     }
 }
 
-function clear_slack_status(): void
+/**
+ * @return void
+ */
+function clearSlackStatus(): void
 {
     $slack_api_key = get_option('slack_api_key', '');
 
@@ -60,9 +66,9 @@ function clear_slack_status(): void
 
     if (is_wp_error($response)) {
         $error_message = $response->get_error_message();
-        update_option('slack_stop_payload', ['CLEAR ERROR', $error_message, 'Catalin']);
+        addLog('CLEAR_STATUS', 'error', $error_message);
     } else {
         $response_code = wp_remote_retrieve_response_code($response);
-        update_option('slack_stop_payload', ['CLEAR', $response_code]);
+        addLog('CLEAR_STATUS', 'success', '');
     }
 }
