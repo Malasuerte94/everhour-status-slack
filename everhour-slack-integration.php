@@ -43,13 +43,11 @@ function handleEverHourWebHook(WP_REST_Request $request): WP_REST_Response
 
     if($everhour_user_id) {
         if (isset($payload['event']) && $payload['event'] == 'api:timer:stopped' && $payload['payload']['data']['taskTime']['user'] == $everhour_user_id) {
-            update_option('everhour_webhook_payload', ['STOP', $payload['payload']['data']['taskTime']['user'], 'Catalin']);
             clearSlackStatus();
         }
 
         if (isset($payload['event']) && $payload['event'] == 'api:timer:started' && $payload['payload']['data']['user']['id'] == $everhour_user_id) {
             $status = $payload['payload']['data']['task']['number'] .':'. $payload['payload']['data']['task']['name'];
-            update_option('everhour_webhook_payload', ['START', $payload['payload']['data']['user']['email'], $status]);
             updateSlackStatus($status);
         }
     }
