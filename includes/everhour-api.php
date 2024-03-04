@@ -1,6 +1,11 @@
 <?php
 
-function create_everhour_webhook($everhour_api_key, $target_url): array
+/**
+ * @param string $everhour_api_key
+ * @param string $target_url
+ * @return array
+ */
+function createEverhourWebhook(string $everhour_api_key, string $target_url): array
 {
     $api_url = 'https://api.everhour.com/hooks';
     $events = ["api:timer:started", "api:timer:stopped"];
